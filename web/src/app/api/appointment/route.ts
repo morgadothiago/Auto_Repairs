@@ -39,8 +39,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, data: appointment })
   } catch (error: any) {
+    console.error("Erro ao criar agendamento:", error)
     return NextResponse.json(
-      { success: false, message: error.message },
+      { success: false, message: error.message, error: error },
       { status: 500 }
     )
   }

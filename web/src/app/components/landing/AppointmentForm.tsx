@@ -108,7 +108,7 @@ export default function AppointmentForm() {
   }
 
   return (
-    <div className="w-full max-w-3xl text-black rounded-xl shadow-lg p-6 space-y-6 mx-auto my-12">
+    <div className="w-[30%]  text-black rounded-xl shadow-lg p-6 space-y-6 mx-auto my-12">
       <h2 className="text-2xl font-bold text-center">Agende seu serviço</h2>
 
       {/* 🔹 Step Indicator */}
@@ -214,14 +214,16 @@ export default function AppointmentForm() {
                 render={({ field }) => (
                   <FormItem className="w-full">
                     <FormLabel>Modelo do Veículo</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Ex: Civic"
-                        {...field}
-                        icon={<Car className="h-4 w-4 text-gray-400" />}
-                        className="w-full"
-                      />
-                    </FormControl>
+                    <div className="relative flex items-center w-full">
+                      <Car className="absolute left-3 h-4 w-4 text-gray-400" />
+                      <FormControl>
+                        <Input
+                          placeholder="Ex: Civic"
+                          {...field}
+                          className="pl-10 w-full"
+                        />
+                      </FormControl>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -232,14 +234,16 @@ export default function AppointmentForm() {
                 render={({ field }) => (
                   <FormItem className="w-full">
                     <FormLabel>Placa do Veículo</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Ex: ABC-1234"
-                        {...field}
-                        icon={<CreditCard className="h-4 w-4 text-gray-400" />}
-                        className="w-full"
-                      />
-                    </FormControl>
+                    <div className="relative flex items-center w-full">
+                      <CreditCard className="absolute left-3 h-4 w-4 text-gray-400" />
+                      <FormControl>
+                        <Input
+                          placeholder="Ex: ABC-1234"
+                          {...field}
+                          className="pl-10 w-full"
+                        />
+                      </FormControl>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -250,14 +254,16 @@ export default function AppointmentForm() {
                 render={({ field }) => (
                   <FormItem className="w-full">
                     <FormLabel>Ano do Veículo</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Ex: 2020"
-                        {...field}
-                        icon={<Calendar className="h-4 w-4 text-gray-400" />}
-                        className="w-full"
-                      />
-                    </FormControl>
+                    <div className="relative flex items-center w-full">
+                      <Calendar className="absolute left-3 h-4 w-4 text-gray-400" />
+                      <FormControl>
+                        <Input
+                          placeholder="Ex: 2020"
+                          {...field}
+                          className="pl-10 w-full"
+                        />
+                      </FormControl>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -302,14 +308,16 @@ export default function AppointmentForm() {
                 render={({ field }) => (
                   <FormItem className="w-full">
                     <FormLabel>Data do Agendamento</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="date"
-                        {...field}
-                        icon={<Calendar className="h-4 w-4 text-gray-400" />}
-                        className="w-full"
-                      />
-                    </FormControl>
+                    <div className="relative flex items-center w-full">
+                      <Calendar className="absolute left-3 h-4 w-4 text-gray-400" />
+                      <FormControl>
+                        <Input
+                          type="date"
+                          {...field}
+                          className="pl-10 w-full"
+                        />
+                      </FormControl>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}

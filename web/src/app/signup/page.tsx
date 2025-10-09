@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import {
   Card,
   CardContent,
@@ -13,51 +12,70 @@ import {
 import { Label } from "@/components/ui/label"
 import { Controller, useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
-import * as yup from "yup" // <- componente com ícone
-import { Mail, Lock } from "lucide-react" // <- ícones
+import * as yup from "yup"
+import { Mail, Lock, User } from "lucide-react"
 import TextInput from "../components/Input"
-import { useAuth } from "../context/AuthContext"
-import { signIn } from "next-auth/react"
-import { Form } from "@/components/ui/form"
 import { toast } from "sonner"
 import { useState } from "react";
 import LoadingScreen from "../components/LoadingScreen";
 
 // 1. Schema de validação
-const signInSchema = yup.object().shape({
+const signUpSchema = yup.object().shape({
+  name: yup.string().required("Nome é obrigatório"),
   email: yup.string().email("Email inválido").required("Email é obrigatório"),
-  password: yup.string().required("Senha é obrigatória"),
+  password: yup.string().min(6, "A senha deve ter pelo menos 6 caracteres").required("Senha é obrigatória"),
+  role: yup.string().required("Função é obrigatória"), // Adicionado campo de role
 })
 
-type SignInFormData = yup.InferType<typeof signInSchema>
+type SignUpFormData = yup.InferType<typeof signUpSchema>
 
-export default function LoginPage() {
+export default function SignUpPage() {
   const router = useRouter()
-  const { isAuthenticated, isLoading: authLoading } = useAuth()
   const [isLoading, setIsLoading] = useState(false);
 
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<SignInFormData>({
-    resolver: yupResolver(signInSchema),
+  } = useForm<SignUpFormData>({
+    resolver: yupResolver(signUpSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
+      role: "user", // Valor padrão para role
     },
   })
 
-  const onSubmit = async (data: SignInFormData) => {
-    setIsLoading(true); // Show loading screen immediately
-    const res = await signIn("credentials", {
-      email: data.email,
-      password: data.password,
-      redirect: false,
-    })
+  const onSubmit = async (data: SignUpFormData) => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
-    if (res?.error) {
-      toast.error("Erro ao fazer login.", {
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Erro ao cadastrar usuário.");
+      }
+
+      toast.success("✅ Cadastro efetuado com sucesso! Redirecionando para o login...", {
+        position: "top-right",
+        richColors: true,
+        duration: 4000,
+        style: {
+          background: "linear-gradient(90deg, #4b6cb7 0%, #182848 100%)",
+          color: "#fff",
+        },
+      });
+
+      router.push("/signin");
+    } catch (error: any) {
+      toast.error("Erro ao cadastrar.", {
         duration: 3000,
         position: "top-right",
         richColors: true,
@@ -68,37 +86,47 @@ export default function LoginPage() {
           padding: "12px 16px",
           fontWeight: "500",
         },
-        description: res.error,
-      })
-      setIsLoading(false); // Hide loading screen on error
-      return
+        description: error.message,
+      });
+    } finally {
+      setIsLoading(false);
     }
-
-    toast.success("✅ Login efetuado com sucesso!", {
-      position: "top-right",
-      richColors: true,
-      duration: 4000,
-      style: {
-        background: "linear-gradient(90deg, #4b6cb7 0%, #182848 100%)",
-        color: "#fff",
-      },
-    })
-
-    router.push("/dashboard")
-    setIsLoading(false); // Hide loading screen after navigation
   }
-
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <LoadingScreen isLoading={isLoading} />
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader>
-          <CardTitle className="text-center text-2xl">Login</CardTitle>
+          <CardTitle className="text-center text-2xl">Cadastro</CardTitle>
         </CardHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex gap-4 flex-col">
           <CardContent className="space-y-4">
+            {/* NOME */}
+            <div>
+              <Label htmlFor="name">Nome</Label>
+              <Controller
+                name="name"
+                control={control}
+                render={({ field }) => (
+                  <TextInput
+                    icon={<User className="h-4 w-4 text-muted-foreground" />}
+                    type="text"
+                    placeholder="Digite seu nome"
+                    value={field.value}
+                    onChange={(e) => field.onChange(e.target.value)}
+                    onBlur={field.onBlur}
+                  />
+                )}
+              />
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.name.message}
+                </p>
+              )}
+            </div>
+
             {/* EMAIL */}
             <div>
               <Label htmlFor="email">Email</Label>
@@ -146,18 +174,16 @@ export default function LoginPage() {
                 </p>
               )}
             </div>
+
+            {/* ROLE (oculto por enquanto, com valor padrão) */}
+            <input type="hidden" {...control.register("role")} />
+
           </CardContent>
 
           <CardFooter>
             <Button type="submit" className="w-full cursor-pointer">
-              Entrar
+              Cadastrar
             </Button>
-            <p className="text-center text-sm text-gray-600 mt-4">
-              Não tem uma conta?{" "}
-              <a href="/signup" className="text-blue-600 hover:underline">
-                Cadastre-se
-              </a>
-            </p>
           </CardFooter>
         </form>
       </Card>
