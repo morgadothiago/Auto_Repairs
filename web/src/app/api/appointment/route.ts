@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     }
 
     // converte types para o que o Prisma espera
-    const appointment = await prisma.schedule.create({
+    const appointment = await prisma.leeads.create({
       data: {
         name,
         phone,
