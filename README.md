@@ -62,10 +62,10 @@ Este projeto é uma aplicação web para oficinas mecânicas, criada com Next.js
 
 6.  **Acesse no navegador:**
     - Abra [http://localhost:3000](http://localhost:3000)
-    - Para autenticação, acesse [http://localhost:3000/signin](http://localhost:3000/signin)
+    - Para acessar o sistema interno, acesse [http://localhost:3000/signin](http://localhost:3000/signin)
 
 ## Observações
 
 - O sistema utiliza autenticação via NextAuth.js. Certifique-se de configurar as variáveis de ambiente necessárias se for usar provedores externos.
-- O backend de autenticação está configurado para `http://localhost:3001/auth/login` (veja o arquivo `src/app/api/auth/[...nextauth]/route.ts`).
-- Para funcionamento completo, é necessário que o backend esteja rodando na porta 3001.
+- O backend de autenticação está configurado para `http://localhost:3000/auth/login` (veja o arquivo `src/app/api/auth/[...nextauth]/route.ts`).
+- Para funcionamento completo, é necessário que o backend esteja rodando na porta 3000.
