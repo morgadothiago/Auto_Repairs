@@ -16,14 +16,17 @@ import * as yup from "yup"
 import { Mail, Lock, User } from "lucide-react"
 import TextInput from "../components/Input"
 import { toast } from "sonner"
-import { useState } from "react";
-import LoadingScreen from "../components/LoadingScreen";
+import { useState } from "react"
+import LoadingScreen from "../components/LoadingScreen"
 
 // 1. Schema de validação
 const signUpSchema = yup.object().shape({
   name: yup.string().required("Nome é obrigatório"),
   email: yup.string().email("Email inválido").required("Email é obrigatório"),
-  password: yup.string().min(6, "A senha deve ter pelo menos 6 caracteres").required("Senha é obrigatória"),
+  password: yup
+    .string()
+    .min(6, "A senha deve ter pelo menos 6 caracteres")
+    .required("Senha é obrigatória"),
   role: yup.string().required("Função é obrigatória"), // Adicionado campo de role
 })
 
@@ -31,7 +34,7 @@ type SignUpFormData = yup.InferType<typeof signUpSchema>
 
 export default function SignUpPage() {
   const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false)
 
   const {
     control,
@@ -48,7 +51,7 @@ export default function SignUpPage() {
   })
 
   const onSubmit = async (data: SignUpFormData) => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
       const res = await fetch("/api/users", {
         method: "POST",
@@ -56,24 +59,27 @@ export default function SignUpPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-      });
+      })
 
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Erro ao cadastrar usuário.");
+        const errorData = await res.json()
+        throw new Error(errorData.message || "Erro ao cadastrar usuário.")
       }
 
-      toast.success("✅ Cadastro efetuado com sucesso! Redirecionando para o login...", {
-        position: "top-right",
-        richColors: true,
-        duration: 4000,
-        style: {
-          background: "linear-gradient(90deg, #4b6cb7 0%, #182848 100%)",
-          color: "#fff",
-        },
-      });
+      toast.success(
+        "✅ Cadastro efetuado com sucesso! Redirecionando para o login...",
+        {
+          position: "top-right",
+          richColors: true,
+          duration: 4000,
+          style: {
+            background: "linear-gradient(90deg, #4b6cb7 0%, #182848 100%)",
+            color: "#fff",
+          },
+        }
+      )
 
-      router.push("/signin");
+      router.push("/signin")
     } catch (error: any) {
       toast.error("Erro ao cadastrar.", {
         duration: 3000,
@@ -87,9 +93,9 @@ export default function SignUpPage() {
           fontWeight: "500",
         },
         description: error.message,
-      });
+      })
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
   }
 
@@ -174,17 +180,7 @@ export default function SignUpPage() {
                 </p>
               )}
             </div>
-
-            {/* ROLE (oculto por enquanto, com valor padrão) */}
-            <input type="hidden" {...control.register("role")} />
-
           </CardContent>
-
-          <CardFooter>
-            <Button type="submit" className="w-full cursor-pointer">
-              Cadastrar
-            </Button>
-          </CardFooter>
         </form>
       </Card>
     </div>

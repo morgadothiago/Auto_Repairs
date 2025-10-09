@@ -20,8 +20,8 @@ import { useAuth } from "../context/AuthContext"
 import { signIn } from "next-auth/react"
 import { Form } from "@/components/ui/form"
 import { toast } from "sonner"
-import { useState } from "react";
-import LoadingScreen from "../components/LoadingScreen";
+import { useState } from "react"
+import LoadingScreen from "../components/LoadingScreen"
 
 // 1. Schema de validação
 const signInSchema = yup.object().shape({
@@ -34,7 +34,7 @@ type SignInFormData = yup.InferType<typeof signInSchema>
 export default function LoginPage() {
   const router = useRouter()
   const { isAuthenticated, isLoading: authLoading } = useAuth()
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false)
 
   const {
     control,
@@ -49,7 +49,7 @@ export default function LoginPage() {
   })
 
   const onSubmit = async (data: SignInFormData) => {
-    setIsLoading(true); // Show loading screen immediately
+    setIsLoading(true) // Show loading screen immediately
     const res = await signIn("credentials", {
       email: data.email,
       password: data.password,
@@ -70,7 +70,7 @@ export default function LoginPage() {
         },
         description: res.error,
       })
-      setIsLoading(false); // Hide loading screen on error
+      setIsLoading(false) // Hide loading screen on error
       return
     }
 
@@ -85,9 +85,8 @@ export default function LoginPage() {
     })
 
     router.push("/dashboard")
-    setIsLoading(false); // Hide loading screen after navigation
+    setIsLoading(false) // Hide loading screen after navigation
   }
-
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -152,12 +151,6 @@ export default function LoginPage() {
             <Button type="submit" className="w-full cursor-pointer">
               Entrar
             </Button>
-            <p className="text-center text-sm text-gray-600 mt-4">
-              Não tem uma conta?{" "}
-              <a href="/signup" className="text-blue-600 hover:underline">
-                Cadastre-se
-              </a>
-            </p>
           </CardFooter>
         </form>
       </Card>

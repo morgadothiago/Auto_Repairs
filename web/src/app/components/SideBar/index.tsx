@@ -1,26 +1,29 @@
+import Link from "next/link"
 import {
   Calendar,
   DollarSign,
   Home,
-  Inbox,
-  Search,
+  Rss,
   Settings,
-  ToolCaseIcon,
+  ToolCase,
   Users,
+  FileSignature,
+  CreditCard,
+  UserRoundPlusIcon,
+  Bell,
+  BellDot,
 } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
-  SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/app/context/AuthContext"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 
 export const menuItems = [
@@ -40,7 +43,13 @@ export const menuItems = [
   {
     title: "Serviços",
     url: "/services",
-    icon: ToolCaseIcon,
+    icon: ToolCase,
+    roles: ["admin", "user"],
+  },
+  {
+    title: "Cadastro de cliente",
+    url: "/dashboard/user/register_client",
+    icon: UserRoundPlusIcon,
     roles: ["admin", "user"],
   },
   { title: "Faturamento", url: "/billing", icon: DollarSign, roles: ["admin"] },
@@ -56,21 +65,51 @@ export const menuItems = [
     icon: Users,
     roles: ["admin"],
   },
+  { title: "Feeds", url: "/dashboard/admin/feed", icon: Rss, roles: ["admin"] },
+  {
+    title: "Contratos",
+    url: "/dashboard/admin/ordem_services",
+    icon: FileSignature,
+    roles: ["admin"],
+  },
+  {
+    title: "Pagamentos",
+    url: "/dashboard/admin/payments",
+    icon: CreditCard,
+    roles: ["admin"],
+  },
+  {
+    title: "Ordem de Serviços",
+    url: "/dashboard/admin/ordem_services",
+    icon: ToolCase,
+    roles: ["admin", "user"],
+  },
+  {
+    title: "Notificações",
+    url: "/dashboard/admin/notifications",
+    icon: Bell,
+    roles: ["admin", "user"],
+  },
 ]
 
 export function AppSidebar() {
   const { isAuthenticated, user } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
-
-  console.log(user)
+  const [hasNotifications, setHasNotifications] = useState(false)
 
   useEffect(() => {
-    console.log("User in AppSidebar:", user)
     if (!isAuthenticated) {
       router.push("/signin")
     }
-  }, [isAuthenticated, router, user])
+    setHasNotifications(!true)
+  }, [isAuthenticated, router])
+
+  if (!user || !user.role) return null
+
+  const userRole = user.role.toLowerCase()
+
+  const filteredMenu = menuItems.filter((item) => item.roles.includes(userRole))
 
   return (
     <Sidebar>
@@ -79,7 +118,7 @@ export function AppSidebar() {
           <SidebarGroupLabel className="w-full h-16 flex items-center">
             <SidebarHeader className="px-4 py-2">
               <div className="flex items-center gap-4">
-                <div className="w-8 h-8 rounded-sm bg-white border-black border-[1px] "></div>
+                <div className="w-8 h-8 rounded-sm bg-white border-black border-[1px]" />
                 <h1 className="text-black text-lg font-semibold">
                   Auto Repair
                 </h1>
@@ -87,41 +126,39 @@ export function AppSidebar() {
             </SidebarHeader>
           </SidebarGroupLabel>
 
-          <SidebarGroupContent className="px-2">
-            {user?.role && (
-              <h1 className="text-black text-lg font-semibold mb-4">
-                Área do {user.role === "ADMIN" ? "Administrador" : "Mecanico"}
-              </h1>
-            )}
+          <SidebarGroupLabel className="px-4 mt-4">
+            <h1 className="text-black text-lg font-semibold">
+              Área do {userRole === "admin" ? "Administrador" : "Mecânico"}
+            </h1>
+          </SidebarGroupLabel>
 
-            <SidebarMenu>
-              {menuItems
-                .filter(
-                  (item) =>
-                    user?.role && item.roles.includes(user.role.toLowerCase())
-                )
-                .map((item) => {
-                  const isActive = pathname === item.url
-                  return (
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild className="mb-1">
-                        <a
-                          href={item.url}
-                          className={`flex h-10 items-center gap-2 px-4 py-2 rounded-md transition-colors duration-200 ${
-                            isActive
-                              ? "bg-black text-white shadow-md"
-                              : "text-black hover:bg-gray-100 hover:text-black"
-                          }`}
-                        >
-                          <item.icon className="h-5 w-5" />
-                          <span className="font-semibold">{item.title}</span>
-                        </a>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  )
-                })}
-            </SidebarMenu>
-          </SidebarGroupContent>
+          <SidebarMenu className="px-2 mt-2">
+            {filteredMenu.map((item) => {
+              const isActive = pathname === item.url
+              const isNotifications =
+                item.title.toLowerCase() === "notificações"
+
+              return (
+                <SidebarMenuItem key={item.title}>
+                  <Link
+                    href={item.url}
+                    className={`flex h-10 items-center gap-2 px-4 py-2 rounded-md transition-colors duration-200 ${
+                      isActive
+                        ? "bg-black text-white shadow-md"
+                        : "text-black hover:bg-gray-100 hover:text-black"
+                    }`}
+                  >
+                    {isNotifications && hasNotifications ? (
+                      <BellDot className="h-5 w-5 text-red-500" />
+                    ) : (
+                      <item.icon className="h-5 w-5" />
+                    )}
+                    <span className="font-semibold">{item.title}</span>
+                  </Link>
+                </SidebarMenuItem>
+              )
+            })}
+          </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
