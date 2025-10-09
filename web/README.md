@@ -13,7 +13,7 @@ Este projeto é uma aplicação web para oficinas mecânicas, criada com Next.js
 1. **Pré-requisitos:**
    - Node.js instalado (versão recomendada 18 ou superior)
    - npm ou yarn
-   - PostgreSQL (ou outro banco de dados configurado no `prisma/schema.prisma`)
+   - Docker e Docker Compose instalados (para rodar o banco de dados)
 
 2. **Instale as dependências:**
    ```bash
@@ -22,12 +22,20 @@ Este projeto é uma aplicação web para oficinas mecânicas, criada com Next.js
    yarn install
    ```
 
-3. **Configure o banco de dados:**
-   - Certifique-se de que seu banco de dados PostgreSQL esteja rodando.
-   - Copie o arquivo `.env.example` para `.env` e configure suas variáveis de ambiente, especialmente `DATABASE_URL`.
+3. **Configuração do Banco de Dados com Docker:**
+   - Certifique-se de que o Docker esteja em execução.
+   - Copie o arquivo `.env.example` para `.env` na raiz do projeto e configure suas variáveis de ambiente, especialmente `DATABASE_URL` para apontar para o seu contêiner Docker (ex: `postgresql://user:password@localhost:5432/mydatabase`).
+   - Inicie o contêiner do banco de dados PostgreSQL usando Docker Compose:
+     ```bash
+     docker-compose up -d
+     ```
    - Execute as migrações do Prisma para criar as tabelas no banco de dados:
      ```bash
      npx prisma migrate dev
+     ```
+   - (Opcional) Se você tiver dados iniciais para popular o banco de dados, execute o seed:
+     ```bash
+     npx prisma db seed
      ```
 
 4. **Inicie o servidor de desenvolvimento:**
