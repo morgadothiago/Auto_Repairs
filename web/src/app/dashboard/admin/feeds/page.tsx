@@ -5,14 +5,16 @@ import { ListTable } from "@/app/components/ListTable"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, ArrowRight } from "lucide-react"
 import { toast } from "sonner"
+import { useAuth } from "@/app/context/AuthContext"
 
 export default function Feeds() {
+  const { user } = useAuth()
   const [data, setData] = useState([])
   const [empty, setEmpty] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(10)
   const [totalPages, setTotalPages] = useState(0)
-  const initialized = useRef(false) // Adicionado useRef para controlar a inicialização
+  const initialized = useRef(false)
 
   const getAllLeeds = async (page: number, limit: number) => {
     console.log("getAllLeeds called") // Debug log
@@ -77,6 +79,7 @@ export default function Feeds() {
   }
 
   useEffect(() => {
+    console.log(user?.id)
     console.log("useEffect called") // Debug log
     if (!initialized.current) {
       initialized.current = true
@@ -135,8 +138,8 @@ export default function Feeds() {
       const payload = {
         ...itemData,
         leadId: itemData.id,
-        userId: "8097d4a5-6738-46d5-ba81-22679e21ec1f",
-      } // Substitua "SEU_USER_ID_AQUI" pelo ID do usuário real
+        userId: user?.id,
+      }
       const response = await fetch("/api/appointment", {
         method: "POST",
         headers: {
@@ -144,12 +147,9 @@ export default function Feeds() {
         },
         body: JSON.stringify(payload),
       })
-
-      console.log(await response.json())
-
       if (response.ok) {
         toast.success("✅ Agendamento confirmado com sucesso!", {
-          id: "appointment-success", // Adicionado um ID único para evitar duplicação
+          id: "appointment-success",
           position: "top-right",
           richColors: true,
           duration: 4000,
@@ -158,9 +158,10 @@ export default function Feeds() {
             color: "#fff",
           },
         })
+        console.log("Agendamento confirmado com sucesso!", payload)
       } else {
         toast.error("Agendamento ja foi confirmado.", {
-          id: "appointment-error", // Adicionado um ID único para evitar duplicação
+          id: "appointment-error",
           position: "top-right",
           richColors: true,
           duration: 4000,
@@ -180,8 +181,6 @@ export default function Feeds() {
         <p className="mt-2 text-lg text-gray-600">
           Listando todos os feeds que vieram do site
         </p>
-
-        {/* Área da listagem dos feeds */}
         <div className="mt-4 overflow-x-auto">
           {empty ? (
             <div className="p-6 text-center text-gray-500">
@@ -196,7 +195,6 @@ export default function Feeds() {
           )}
         </div>
 
-        {/* Controles de Paginação */}
         <div className="flex justify-between items-center mt-4">
           <Button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
