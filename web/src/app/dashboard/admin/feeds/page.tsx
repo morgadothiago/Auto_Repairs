@@ -85,13 +85,39 @@ export default function Feeds() {
     }
   }, [currentPage, itemsPerPage])
 
-  async function handleAppointmentChange(
+  const handleAppointmentChangeInDashboard = async (
     itemId: string,
     newValue: string,
     itemData: any
-  ) {
-    console.log("Mudança de agendamento detectada:", itemId, newValue, itemData)
-    // Adicione a lógica para atualizar o agendamento no backend aqui
+  ) => {
+    console.log("Mudança de agendamento detectada no Dashboard:")
+    console.log("ID do Item:", itemId)
+    console.log("Novo Valor:", newValue)
+    console.log("Dados completos do item:", itemData)
+
+    if (newValue === "nao") {
+      try {
+        const response = await fetch("/api/send-to-n8n", {
+          // Você criará este endpoint no seu backend
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(itemData), // Envia todos os dados do item
+        })
+
+        if (response.ok) {
+          console.log("Dados enviados com sucesso para o backend para n8n.")
+          // Opcional: mostrar uma notificação de sucesso ao usuário
+        } else {
+          console.error("Falha ao enviar dados para o backend para n8n.")
+          // Opcional: mostrar uma notificação de erro ao usuário
+        }
+      } catch (error) {
+        console.error("Erro ao fazer requisição para o backend:", error)
+        // Opcional: mostrar uma notificação de erro ao usuário
+      }
+    }
   }
 
   return (
@@ -112,7 +138,7 @@ export default function Feeds() {
             <ListTable
               data={data}
               title="Lista de Leads"
-              onAppointmentChange={handleAppointmentChange}
+              onAppointmentChange={handleAppointmentChangeInDashboard}
             />
           )}
         </div>
@@ -144,15 +170,4 @@ export default function Feeds() {
       </div>
     </div>
   )
-}
-
-const handleAppointmentChangeInDashboard = (
-  itemId: string,
-  newValue: string,
-  itemData: any
-) => {
-  console.log("Mudança de agendamento detectada no Dashboard:")
-  console.log("ID do Item:", itemId)
-  console.log("Novo Valor:", newValue)
-  console.log("Dados Completos do Item:", itemData)
 }

@@ -30,21 +30,29 @@ type TableData = {
   year: number
   serviceType: string
   date: string | Date
-  appointment?: boolean
+  appointment?: 'sim' | 'nao' | 'pendente'
 }
 
 interface DynamicTableProps {
   data: TableData[]
   title?: string
-  onAppointmentChange?: (itemId: string, newValue: string, itemData: TableData) => void;
+  onAppointmentChange?: (
+    itemId: string,
+    newValue: string,
+    itemData: TableData
+  ) => void
 }
 
-export function ListTable({ data, title, onAppointmentChange }: DynamicTableProps) {
-  const [tableData, setTableData] = React.useState(data);
+export function ListTable({
+  data,
+  title,
+  onAppointmentChange,
+}: DynamicTableProps) {
+  const [tableData, setTableData] = React.useState(data)
 
   React.useEffect(() => {
-    setTableData(data);
-  }, [data]);
+    setTableData(data)
+  }, [data])
 
   if (!tableData || tableData.length === 0) {
     return (
@@ -65,28 +73,27 @@ export function ListTable({ data, title, onAppointmentChange }: DynamicTableProp
   }
 
   const handleAppointmentChange = (itemId: string, newValue: string) => {
-    let updatedItem: TableData | undefined;
-    setTableData(prevData =>
-      prevData.map(item => {
+    let updatedItem: TableData | undefined
+    setTableData((prevData) =>
+      prevData.map((item) => {
         if (item.id === itemId) {
-          updatedItem = { ...item, appointment: newValue === "sim" };
-          return updatedItem;
+          updatedItem = { ...item, appointment: newValue as 'sim' | 'nao' | 'pendente' }
+          return updatedItem
         }
-        return item;
+        return item
       })
-    );
+    )
 
     if (updatedItem) {
-      if (newValue === "sim") {
-        console.log(`Agendamento para item ${itemId} alterado para: ${newValue}`, updatedItem);
-      } else {
-        console.log(`Agendamento para item ${itemId} alterado para: ${newValue}`);
-      }
+      console.log(
+        `Agendamento para item ${itemId} alterado para: ${newValue}`,
+        updatedItem
+      )
       if (onAppointmentChange) {
-        onAppointmentChange(itemId, newValue, updatedItem);
+        onAppointmentChange(itemId, newValue, updatedItem)
       }
     }
-  };
+  }
 
   return (
     <div className="w-full rounded-lg border  shadow-sm">
@@ -217,8 +224,10 @@ export function ListTable({ data, title, onAppointmentChange }: DynamicTableProp
                   </span>
                 </div>
                 <Select
-                  value={item.appointment ? "sim" : "nao"}
-                  onValueChange={(newValue) => handleAppointmentChange(item.id, newValue)}
+                  value={item.appointment || "pendente"}
+                  onValueChange={(newValue) =>
+                    handleAppointmentChange(item.id, newValue)
+                  }
                 >
                   <SelectTrigger className="w-[100px]">
                     <SelectValue placeholder="Status" />
@@ -226,6 +235,7 @@ export function ListTable({ data, title, onAppointmentChange }: DynamicTableProp
                   <SelectContent>
                     <SelectItem value="sim">Sim</SelectItem>
                     <SelectItem value="nao">Não</SelectItem>
+                    <SelectItem value="pendente">Pendente</SelectItem>
                   </SelectContent>
                 </Select>
               </TableCell>
