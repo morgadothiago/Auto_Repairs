@@ -28,6 +28,7 @@ CREATE TABLE "Leeads" (
     "year" INTEGER NOT NULL,
     "serviceType" TEXT NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
+    "converted" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -46,6 +47,7 @@ CREATE TABLE "Appointments" (
     "serviceType" TEXT NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
     "userId" TEXT NOT NULL,
+    "leadId" TEXT,
     "confirmationStatus" "ConfirmationStatus" NOT NULL DEFAULT 'PENDING',
     "confirmedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -70,6 +72,9 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- AddForeignKey
 ALTER TABLE "Appointments" ADD CONSTRAINT "Appointments_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Appointments" ADD CONSTRAINT "Appointments_leadId_fkey" FOREIGN KEY ("leadId") REFERENCES "Leeads"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "AppointmentConfirmation" ADD CONSTRAINT "AppointmentConfirmation_appointmentId_fkey" FOREIGN KEY ("appointmentId") REFERENCES "Appointments"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

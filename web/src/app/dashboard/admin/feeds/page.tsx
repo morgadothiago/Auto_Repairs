@@ -48,7 +48,7 @@ export default function Feeds() {
       setTotalPages(result.totalPages);
 
       console.log("Calling toast.success"); // Debug log
-      toast.success("✅ Leads carregados com sucesso!", {
+      toast.success("✅ Agendamentos carregados com sucesso!", {
         id: "leads-loaded-success", // Adicionado um ID único para evitar duplicação
         position: "top-right",
         richColors: true,
@@ -100,7 +100,7 @@ export default function Feeds() {
               Nenhum dado encontrado.
             </div>
           ) : (
-            <ListTable data={data} title="Lista de Leads" />
+            <ListTable data={data} title="Lista de Agendamentos" />
           )}
         </div>
 
