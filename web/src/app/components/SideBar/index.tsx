@@ -53,19 +53,19 @@ export const menuItems = [
     roles: ["admin", "user"],
   },
   { title: "Faturamento", url: "/billing", icon: DollarSign, roles: ["admin"] },
-  {
-    title: "Configurações",
-    url: "/settings",
-    icon: Settings,
-    roles: ["admin"],
-  },
+
   {
     title: "Usuarios",
     url: "/dashboard/admin/users",
     icon: Users,
     roles: ["admin"],
   },
-  { title: "Feeds", url: "/dashboard/admin/feed", icon: Rss, roles: ["admin"] },
+  {
+    title: "feeds",
+    url: "/dashboard/admin/feeds",
+    icon: Rss,
+    roles: ["admin"],
+  },
   {
     title: "Contratos",
     url: "/dashboard/admin/ordem_services",
