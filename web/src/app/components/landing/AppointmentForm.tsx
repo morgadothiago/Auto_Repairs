@@ -82,7 +82,7 @@ export default function AppointmentForm() {
       // converte year para número
       const payload = { ...data, year: Number(data.year), date: data.date }
 
-      const res = await fetch("/api/appointment", {
+      const res = await fetch("/api/leeds", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -91,14 +91,14 @@ export default function AppointmentForm() {
       const result = await res.json()
       if (!result.success) throw new Error(result.message)
 
-      toast.success("✅ Agendamento criado com sucesso!", {
-        description: `${data.date} - ${data.serviceType}`,
+      toast.success("✅ Lead criado com sucesso!", {
+        description: `${data.name} - ${data.email}`,
         position: "top-right",
         duration: 4000,
       })
 
       console.log(
-        "Agendamento realizado com sucesso. Resetando formulário e voltando ao passo 1."
+        "Lead criado com sucesso. Resetando formulário e voltando ao passo 1."
       )
       setStep(1)
       form.reset()
@@ -354,7 +354,7 @@ export default function AppointmentForm() {
                     Enviando...
                   </span>
                 ) : (
-                  "Confirmar Agendamento"
+                  "Confirmar Lead"
                 )}
               </Button>
             )}

@@ -10,11 +10,11 @@ export async function GET(request: Request) {
     const skip = (page - 1) * limit
 
     const [appointments, totalCount] = await prisma.$transaction([
-      prisma.appointments.findMany({
+      prisma.leeads.findMany({
         skip: skip,
         take: limit,
       }),
-      prisma.appointments.count(),
+      prisma.leeads.count(),
     ])
 
     const totalPages = Math.ceil(totalCount / limit)
@@ -37,7 +37,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, phone, email, model, plate, year, serviceType, date, userId } = body
+    const { name, phone, email, model, plate, year, serviceType, date } = body
 
     // validação simples
     if (
@@ -48,8 +48,7 @@ export async function POST(request: Request) {
       !plate ||
       !year ||
       !serviceType ||
-      !date ||
-      !userId
+      !date
     ) {
       return NextResponse.json(
         { success: false, message: "Campos obrigatórios faltando." },
@@ -57,34 +56,17 @@ export async function POST(request: Request) {
       )
     }
 
-    // converte year para número e valida data
-    const convertedYear = Number(year);
-    if (isNaN(convertedYear)) {
-      return NextResponse.json(
-        { success: false, message: "O ano fornecido não é um número válido." },
-        { status: 400 }
-      );
-    }
-
-    const convertedDate = new Date(date);
-    if (isNaN(convertedDate.getTime())) {
-      return NextResponse.json(
-        { success: false, message: "A data fornecida não é uma data válida." },
-        { status: 400 }
-      );
-    }
-
-    const appointment = await prisma.appointments.create({
+    // converte year para número
+    const appointment = await prisma.leeads.create({
       data: {
         name,
         phone,
         email,
         model,
         plate,
-        year: convertedYear,
+        year: Number(year),
         serviceType,
-        date: convertedDate, // Converte a string da data para um objeto Date
-        userId,
+        date: new Date(date), // Converte a string da data para um objeto Date
       },
     })
 

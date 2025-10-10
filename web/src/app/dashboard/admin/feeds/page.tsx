@@ -1,26 +1,26 @@
-"use client";
+"use client"
 
-import { useState, useEffect, useRef } from "react"; // Adicionado useRef
-import { ListTable } from "@/app/components/ListTable";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import { toast } from "sonner";
+import { useState, useEffect, useRef } from "react" // Adicionado useRef
+import { ListTable } from "@/app/components/ListTable"
+import { Button } from "@/components/ui/button"
+import { ArrowLeft, ArrowRight } from "lucide-react"
+import { toast } from "sonner"
 
 export default function Feeds() {
-  const [data, setData] = useState([]);
-  const [empty, setEmpty] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
-  const [totalPages, setTotalPages] = useState(0);
-  const initialized = useRef(false); // Adicionado useRef para controlar a inicialização
+  const [data, setData] = useState([])
+  const [empty, setEmpty] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage] = useState(10)
+  const [totalPages, setTotalPages] = useState(0)
+  const initialized = useRef(false) // Adicionado useRef para controlar a inicialização
 
   const getAllLeeds = async (page: number, limit: number) => {
-    console.log("getAllLeeds called"); // Debug log
+    console.log("getAllLeeds called") // Debug log
     try {
-      const res = await fetch(`/api/appointment?page=${page}&limit=${limit}`, {
+      const res = await fetch(`/api/leeds?page=${page}&limit=${limit}`, {
         cache: "no-store",
-      });
-      const result = await res.json();
+      })
+      const result = await res.json()
 
       if (!res.ok) {
         toast.error("Erro ao buscar leads.", {
@@ -35,20 +35,20 @@ export default function Feeds() {
             fontWeight: "500",
           },
           description: result.message || "Erro desconhecido",
-        });
+        })
         throw new Error(
           `Erro ao buscar dados: ${res.statusText} - ${
             result.message || "Erro desconhecido"
           }`
-        );
+        )
       }
 
-      setData(result.data);
-      setEmpty(result.data.length === 0);
-      setTotalPages(result.totalPages);
+      setData(result.data)
+      setEmpty(result.data.length === 0)
+      setTotalPages(result.totalPages)
 
-      console.log("Calling toast.success"); // Debug log
-      toast.success("✅ Agendamentos carregados com sucesso!", {
+      console.log("Calling toast.success") // Debug log
+      toast.success("✅ Leads carregados com sucesso!", {
         id: "leads-loaded-success", // Adicionado um ID único para evitar duplicação
         position: "top-right",
         richColors: true,
@@ -57,7 +57,7 @@ export default function Feeds() {
           background: "linear-gradient(90deg, #000 0%, #182848 100%)",
           color: "#fff",
         },
-      });
+      })
     } catch (error: any) {
       toast.error("Erro ao carregar leads.", {
         duration: 3000,
@@ -71,19 +71,28 @@ export default function Feeds() {
           fontWeight: "500",
         },
         description: error.message,
-      });
-      setEmpty(true);
+      })
+      setEmpty(true)
     }
-  };
+  }
 
   useEffect(() => {
-    console.log("useEffect called"); // Debug log
+    console.log("useEffect called") // Debug log
     if (!initialized.current) {
-      initialized.current = true;
-      console.log("Initializing getAllLeeds"); // Debug log
-      getAllLeeds(currentPage, itemsPerPage);
+      initialized.current = true
+      console.log("Initializing getAllLeeds") // Debug log
+      getAllLeeds(currentPage, itemsPerPage)
     }
-  }, [currentPage, itemsPerPage]);
+  }, [currentPage, itemsPerPage])
+
+  async function handleAppointmentChange(
+    itemId: string,
+    newValue: string,
+    itemData: any
+  ) {
+    console.log("Mudança de agendamento detectada:", itemId, newValue, itemData)
+    // Adicione a lógica para atualizar o agendamento no backend aqui
+  }
 
   return (
     <div className="w-full h-full px-4 py-4">
@@ -100,7 +109,11 @@ export default function Feeds() {
               Nenhum dado encontrado.
             </div>
           ) : (
-            <ListTable data={data} title="Lista de Agendamentos" />
+            <ListTable
+              data={data}
+              title="Lista de Leads"
+              onAppointmentChange={handleAppointmentChange}
+            />
           )}
         </div>
 
@@ -130,5 +143,16 @@ export default function Feeds() {
         </div>
       </div>
     </div>
-  );
+  )
+}
+
+const handleAppointmentChangeInDashboard = (
+  itemId: string,
+  newValue: string,
+  itemData: any
+) => {
+  console.log("Mudança de agendamento detectada no Dashboard:")
+  console.log("ID do Item:", itemId)
+  console.log("Novo Valor:", newValue)
+  console.log("Dados Completos do Item:", itemData)
 }
