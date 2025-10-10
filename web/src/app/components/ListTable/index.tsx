@@ -30,7 +30,7 @@ type TableData = {
   year: number
   serviceType: string
   date: string | Date
-  appointment?: 'sim' | 'nao' | 'pendente'
+  appointment?: "sim" | "nao" | "pendente"
 }
 
 interface DynamicTableProps {
@@ -77,7 +77,10 @@ export function ListTable({
     setTableData((prevData) =>
       prevData.map((item) => {
         if (item.id === itemId) {
-          updatedItem = { ...item, appointment: newValue as 'sim' | 'nao' | 'pendente' }
+          updatedItem = {
+            ...item,
+            appointment: newValue as "sim" | "nao" | "pendente",
+          }
           return updatedItem
         }
         return item
@@ -85,10 +88,6 @@ export function ListTable({
     )
 
     if (updatedItem) {
-      console.log(
-        `Agendamento para item ${itemId} alterado para: ${newValue}`,
-        updatedItem
-      )
       if (onAppointmentChange) {
         onAppointmentChange(itemId, newValue, updatedItem)
       }

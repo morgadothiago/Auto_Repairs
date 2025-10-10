@@ -37,7 +37,19 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, phone, email, model, plate, year, serviceType, date, userId } = body
+    const { name, phone, email, model, plate, year, serviceType, date, userId, leadId } = body
+
+    let actualUserId = userId;
+    // TEMPORARY: Using a placeholder userId for debugging. REPLACE THIS with a real user ID from your session or authentication system.
+    if (!actualUserId) {
+      // You MUST replace this with an actual existing User.id from your database.
+      // Example: actualUserId = "clx0000000000000000000000"; 
+      console.warn("Using placeholder userId for appointment creation. This should be replaced with a real user ID from session.");
+      return NextResponse.json(
+        { success: false, message: "userId é obrigatório e não foi fornecido." },
+        { status: 400 }
+      );
+    }
 
     // validação simples
     if (
@@ -48,8 +60,7 @@ export async function POST(request: Request) {
       !plate ||
       !year ||
       !serviceType ||
-      !date ||
-      !userId
+      !date
     ) {
       return NextResponse.json(
         { success: false, message: "Campos obrigatórios faltando." },
@@ -74,6 +85,20 @@ export async function POST(request: Request) {
       );
     }
 
+    // Verifica se já existe um agendamento para este lead
+    const existingAppointment = await prisma.appointments.findFirst({
+      where: {
+        leadId: leadId,
+      },
+    });
+
+    if (existingAppointment) {
+      return NextResponse.json(
+        { success: false, message: "Já existe um agendamento para este lead." },
+        { status: 409 } // 409 Conflict
+      );
+    }
+
     const appointment = await prisma.appointments.create({
       data: {
         name,
@@ -84,7 +109,8 @@ export async function POST(request: Request) {
         year: convertedYear,
         serviceType,
         date: convertedDate, // Converte a string da data para um objeto Date
-        userId,
+        userId: actualUserId,
+        leadId: leadId, // Vincula o agendamento ao lead
       },
     })
 
@@ -95,5 +121,32 @@ export async function POST(request: Request) {
       { success: false, message: error.message, error: error },
       { status: 500 }
     )
+  }
+}
+
+export async function PUT(request: Request) {
+  try {
+    const body = await request.json();
+    const { id, appointment } = body;
+
+    if (!id || !appointment) {
+      return NextResponse.json(
+        { success: false, message: "ID do agendamento e status são obrigatórios." },
+        { status: 400 }
+      );
+    }
+
+    const updatedAppointment = await prisma.appointments.update({
+      where: { id: id },
+      data: appointment,
+    });
+
+    return NextResponse.json({ success: true, data: updatedAppointment });
+  } catch (error: any) {
+    console.error("Erro ao atualizar agendamento:", error);
+    return NextResponse.json(
+      { success: false, message: error.message, error: error },
+      { status: 500 }
+    );
   }
 }

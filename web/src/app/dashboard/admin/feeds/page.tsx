@@ -90,32 +90,85 @@ export default function Feeds() {
     newValue: string,
     itemData: any
   ) => {
-    console.log("Mudança de agendamento detectada no Dashboard:")
-    console.log("ID do Item:", itemId)
-    console.log("Novo Valor:", newValue)
-    console.log("Dados completos do item:", itemData)
-
     if (newValue === "nao") {
       try {
         const response = await fetch("/api/send-to-n8n", {
-          // Você criará este endpoint no seu backend
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(itemData), // Envia todos os dados do item
+          body: JSON.stringify(itemData),
         })
 
         if (response.ok) {
-          console.log("Dados enviados com sucesso para o backend para n8n.")
-          // Opcional: mostrar uma notificação de sucesso ao usuário
+          toast.success("✅ dados enviado com sucesso para o n8n", {
+            id: "appointment-nao-success",
+            position: "top-right",
+            richColors: true,
+            duration: 4000,
+            style: {
+              background: "linear-gradient(90deg, #000 0%, #182848 100%)",
+              color: "#fff",
+            },
+          })
         } else {
-          console.error("Falha ao enviar dados para o backend para n8n.")
-          // Opcional: mostrar uma notificação de erro ao usuário
+          toast.error(
+            "Erro ao atualizar agendamento para 'Não' no banco de dados.",
+            {
+              id: "appointment-nao-error",
+              position: "top-right",
+              richColors: true,
+              duration: 4000,
+              style: {
+                background: "linear-gradient(90deg, #b71c1c 0%, #4a0000 100%)",
+                color: "#fff",
+              },
+            }
+          )
         }
       } catch (error) {
         console.error("Erro ao fazer requisição para o backend:", error)
-        // Opcional: mostrar uma notificação de erro ao usuário
+      }
+    }
+
+    if (newValue === "sim") {
+      const payload = {
+        ...itemData,
+        leadId: itemData.id,
+        userId: "8097d4a5-6738-46d5-ba81-22679e21ec1f",
+      } // Substitua "SEU_USER_ID_AQUI" pelo ID do usuário real
+      const response = await fetch("/api/appointment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      })
+
+      console.log(await response.json())
+
+      if (response.ok) {
+        toast.success("✅ Agendamento confirmado com sucesso!", {
+          id: "appointment-success", // Adicionado um ID único para evitar duplicação
+          position: "top-right",
+          richColors: true,
+          duration: 4000,
+          style: {
+            background: "linear-gradient(90deg, #000 0%, #182848 100%)",
+            color: "#fff",
+          },
+        })
+      } else {
+        toast.error("Agendamento ja foi confirmado.", {
+          id: "appointment-error", // Adicionado um ID único para evitar duplicação
+          position: "top-right",
+          richColors: true,
+          duration: 4000,
+          style: {
+            background: "linear-gradient(90deg, #b71c1c 0%, #4a0000 100%)",
+            color: "#fff",
+          },
+        })
       }
     }
   }

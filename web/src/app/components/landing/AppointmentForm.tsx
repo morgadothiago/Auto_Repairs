@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useForm, SubmitHandler } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
+import { appointmentFormSchema } from "@/app/schemas/appointmentFormSchema"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -44,17 +45,6 @@ type FormData = {
   date: string
 }
 
-const schema = yup.object({
-  name: yup.string().required("Informe seu nome"),
-  phone: yup.string().required("Informe o telefone"),
-  email: yup.string().email("E-mail inválido").required("Informe o e-mail"),
-  model: yup.string().required("Informe o modelo do veículo"),
-  plate: yup.string().required("Informe a placa"),
-  year: yup.number().required("Informe o ano").typeError("Ano inválido"),
-  serviceType: yup.string().required("Selecione o tipo de serviço"),
-  date: yup.string().required("Selecione a data"),
-})
-
 const steps = [
   { id: 1, title: "Dados pessoais" },
   { id: 2, title: "Veículo" },
@@ -64,7 +54,7 @@ const steps = [
 export default function AppointmentForm() {
   const [step, setStep] = useState(1)
   const form = useForm<FormData>({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(appointmentFormSchema),
     defaultValues: {
       name: "",
       phone: "",
