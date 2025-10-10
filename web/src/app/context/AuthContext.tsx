@@ -4,6 +4,7 @@ import React, { createContext, useContext } from "react"
 import { useSession, signIn, signOut } from "next-auth/react"
 
 interface User {
+  id: string
   name?: string | null
   email?: string | null
   role?: string | null
