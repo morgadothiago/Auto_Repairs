@@ -1,50 +1,89 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { ListTable } from "@/app/components/ListTable"
+import { useState, useEffect, useRef } from "react"; // Adicionado useRef
+import { ListTable } from "@/app/components/ListTable";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { toast } from "sonner";
 
 export default function Feeds() {
-  const [data, setData] = useState([])
-  const [empty, setEmpty] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage] = useState(10) // Definindo 10 itens por página
-  const [totalPages, setTotalPages] = useState(0)
+  const [data, setData] = useState([]);
+  const [empty, setEmpty] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
+  const initialized = useRef(false); // Adicionado useRef para controlar a inicialização
 
   const getAllLeeds = async (page: number, limit: number) => {
+    console.log("getAllLeeds called"); // Debug log
     try {
       const res = await fetch(`/api/appointment?page=${page}&limit=${limit}`, {
         cache: "no-store",
-      })
-      const result = await res.json() // Lê o corpo da resposta uma única vez
+      });
+      const result = await res.json();
 
       if (!res.ok) {
-        // Se a resposta não for OK, result conterá a mensagem de erro da API
+        toast.error("Erro ao buscar leads.", {
+          duration: 3000,
+          position: "top-right",
+          richColors: true,
+          style: {
+            background: "linear-gradient(90deg, #b71c1c 0%, #4a0000 100%)",
+            color: "#fff",
+            borderRadius: "8px",
+            padding: "12px 16px",
+            fontWeight: "500",
+          },
+          description: result.message || "Erro desconhecido",
+        });
         throw new Error(
           `Erro ao buscar dados: ${res.statusText} - ${
             result.message || "Erro desconhecido"
           }`
-        )
-
-        // colocar toast de erro
+        );
       }
 
-      console.log("Leads carregados:", result.data)
+      setData(result.data);
+      setEmpty(result.data.length === 0);
+      setTotalPages(result.totalPages);
 
-      // colocar toast de acerto
-
-      setData(result.data)
-      setEmpty(result.data.length === 0)
-      setTotalPages(result.totalPages)
+      console.log("Calling toast.success"); // Debug log
+      toast.success("✅ Leads carregados com sucesso!", {
+        id: "leads-loaded-success", // Adicionado um ID único para evitar duplicação
+        position: "top-right",
+        richColors: true,
+        duration: 4000,
+        style: {
+          background: "linear-gradient(90deg, #000 0%, #182848 100%)",
+          color: "#fff",
+        },
+      });
     } catch (error: any) {
-      console.error("Erro ao carregar leads:", error)
-      setEmpty(true)
-      // colocar toast de erro
+      toast.error("Erro ao carregar leads.", {
+        duration: 3000,
+        position: "top-right",
+        richColors: true,
+        style: {
+          background: "linear-gradient(90deg, #b71c1c 0%, #4a0000 100%)",
+          color: "#fff",
+          borderRadius: "8px",
+          padding: "12px 16px",
+          fontWeight: "500",
+        },
+        description: error.message,
+      });
+      setEmpty(true);
     }
-  }
+  };
 
   useEffect(() => {
-    getAllLeeds(currentPage, itemsPerPage)
-  }, [currentPage, itemsPerPage])
+    console.log("useEffect called"); // Debug log
+    if (!initialized.current) {
+      initialized.current = true;
+      console.log("Initializing getAllLeeds"); // Debug log
+      getAllLeeds(currentPage, itemsPerPage);
+    }
+  }, [currentPage, itemsPerPage]);
 
   return (
     <div className="w-full h-full px-4 py-4">
@@ -55,7 +94,7 @@ export default function Feeds() {
         </p>
 
         {/* Área da listagem dos feeds */}
-        <div className="mt-4">
+        <div className="mt-4 overflow-x-auto">
           {empty ? (
             <div className="p-6 text-center text-gray-500">
               Nenhum dado encontrado.
@@ -67,27 +106,29 @@ export default function Feeds() {
 
         {/* Controles de Paginação */}
         <div className="flex justify-between items-center mt-4">
-          <button
+          <Button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
-            className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
+            className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 disabled:opacity-50 inline-flex items-center"
           >
-            Anterior
-          </button>
-          <span>
+            <ArrowLeft className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Anterior</span>
+          </Button>
+          <span className="font-semibold text-gray-700">
             Página {currentPage} de {totalPages}
           </span>
-          <button
+          <Button
             onClick={() =>
               setCurrentPage((prev) => Math.min(prev + 1, totalPages))
             }
             disabled={currentPage === totalPages}
-            className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
+            className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 disabled:opacity-50 inline-flex items-center"
           >
-            Próxima
-          </button>
+            <span className="hidden sm:inline">Próxima</span>
+            <ArrowRight className="w-4 h-4 sm:ml-2" />
+          </Button>
         </div>
       </div>
     </div>
-  )
+  );
 }
