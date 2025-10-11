@@ -67,6 +67,46 @@ CREATE TABLE "AppointmentConfirmation" (
     CONSTRAINT "AppointmentConfirmation_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Clients" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "phone" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Clients_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Vehicles" (
+    "id" TEXT NOT NULL,
+    "model" TEXT NOT NULL,
+    "year" INTEGER NOT NULL,
+    "plate" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Vehicles_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Services" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "price" DOUBLE PRECISION NOT NULL,
+    "clientId" TEXT NOT NULL,
+    "vehicleId" TEXT NOT NULL,
+    "performedByUserId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Services_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
@@ -78,3 +118,12 @@ ALTER TABLE "Appointments" ADD CONSTRAINT "Appointments_leadId_fkey" FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE "AppointmentConfirmation" ADD CONSTRAINT "AppointmentConfirmation_appointmentId_fkey" FOREIGN KEY ("appointmentId") REFERENCES "Appointments"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Services" ADD CONSTRAINT "Services_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "Clients"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Services" ADD CONSTRAINT "Services_vehicleId_fkey" FOREIGN KEY ("vehicleId") REFERENCES "Vehicles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Services" ADD CONSTRAINT "Services_performedByUserId_fkey" FOREIGN KEY ("performedByUserId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
