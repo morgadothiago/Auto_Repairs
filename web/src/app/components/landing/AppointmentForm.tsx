@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useForm, SubmitHandler } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
+import { appointmentFormSchema } from "@/app/schemas/appointmentFormSchema"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -44,17 +45,6 @@ type FormData = {
   date: string
 }
 
-const schema = yup.object({
-  name: yup.string().required("Informe seu nome"),
-  phone: yup.string().required("Informe o telefone"),
-  email: yup.string().email("E-mail inválido").required("Informe o e-mail"),
-  model: yup.string().required("Informe o modelo do veículo"),
-  plate: yup.string().required("Informe a placa"),
-  year: yup.number().required("Informe o ano").typeError("Ano inválido"),
-  serviceType: yup.string().required("Selecione o tipo de serviço"),
-  date: yup.string().required("Selecione a data"),
-})
-
 const steps = [
   { id: 1, title: "Dados pessoais" },
   { id: 2, title: "Veículo" },
@@ -64,7 +54,7 @@ const steps = [
 export default function AppointmentForm() {
   const [step, setStep] = useState(1)
   const form = useForm<FormData>({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(appointmentFormSchema),
     defaultValues: {
       name: "",
       phone: "",
@@ -82,7 +72,7 @@ export default function AppointmentForm() {
       // converte year para número
       const payload = { ...data, year: Number(data.year), date: data.date }
 
-      const res = await fetch("/api/appointment", {
+      const res = await fetch("/api/leeds", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -91,14 +81,14 @@ export default function AppointmentForm() {
       const result = await res.json()
       if (!result.success) throw new Error(result.message)
 
-      toast.success("✅ Agendamento criado com sucesso!", {
-        description: `${data.date} - ${data.serviceType}`,
+      toast.success("✅ Lead criado com sucesso!", {
+        description: `${data.name} - ${data.email}`,
         position: "top-right",
         duration: 4000,
       })
 
       console.log(
-        "Agendamento realizado com sucesso. Resetando formulário e voltando ao passo 1."
+        "Lead criado com sucesso. Resetando formulário e voltando ao passo 1."
       )
       setStep(1)
       form.reset()
@@ -354,7 +344,7 @@ export default function AppointmentForm() {
                     Enviando...
                   </span>
                 ) : (
-                  "Confirmar Agendamento"
+                  "Confirmar Lead"
                 )}
               </Button>
             )}

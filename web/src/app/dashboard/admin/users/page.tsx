@@ -3,6 +3,7 @@
 import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
+import { userFormSchema } from "@/app/schemas/userSchema"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -25,31 +26,10 @@ import { User, Mail, Lock } from "lucide-react"
 import React, { useState } from "react"
 import { Spinner } from "@/components/ui/spinner"
 
-const formSchema = yup
-  .object({
-    name: yup
-      .string()
-      .min(2, "O nome deve ter pelo menos 2 caracteres.")
-      .required("Nome é obrigatório."),
-    email: yup
-      .string()
-      .email("Email inválido.")
-      .required("Email é obrigatório."),
-    password: yup
-      .string()
-      .min(6, "A senha deve ter pelo menos 6 caracteres.")
-      .required("Senha é obrigatória."),
-    role: yup
-      .string()
-      .oneOf(["admin", "user"], "Selecione uma função válida.")
-      .required("Função é obrigatória."),
-  })
-  .required()
-
 export default function Users() {
   const [isLoading, setIsLoading] = useState(false)
-  const form = useForm<yup.InferType<typeof formSchema>>({
-    resolver: yupResolver(formSchema),
+  const form = useForm<yup.InferType<typeof userFormSchema>>({
+    resolver: yupResolver(userFormSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -58,7 +38,7 @@ export default function Users() {
     },
   })
 
-  async function onSubmit(values: yup.InferType<typeof formSchema>) {
+  async function onSubmit(values: yup.InferType<typeof userFormSchema>) {
     setIsLoading(true)
     try {
       const dataToSend = { ...values, role: values.role.toUpperCase() }

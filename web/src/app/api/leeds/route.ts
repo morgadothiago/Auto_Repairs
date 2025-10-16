@@ -9,7 +9,7 @@ export async function GET(request: Request) {
 
     const skip = (page - 1) * limit
 
-    const [leeads, totalCount] = await prisma.$transaction([
+    const [appointments, totalCount] = await prisma.$transaction([
       prisma.leeads.findMany({
         skip: skip,
         take: limit,
@@ -20,13 +20,13 @@ export async function GET(request: Request) {
     const totalPages = Math.ceil(totalCount / limit)
 
     return NextResponse.json({
-      data: leeads,
+      data: appointments,
       totalPages,
       currentPage: page,
       itemsPerPage: limit,
     })
   } catch (error: any) {
-    console.error("Erro ao buscar leads:", error)
+    console.error("Erro ao buscar agendamentos:", error)
     return NextResponse.json(
       { success: false, message: error.message, error: error },
       { status: 500 }
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
       )
     }
 
-    // converte types para o que o Prisma espera
+    // converte year para número
     const appointment = await prisma.leeads.create({
       data: {
         name,
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
         plate,
         year: Number(year),
         serviceType,
-        date: new Date(date),
+        date: new Date(date), // Converte a string da data para um objeto Date
       },
     })
 

@@ -12,6 +12,13 @@ import {
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Phone } from "lucide-react"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 type TableData = {
   id: string
@@ -23,15 +30,31 @@ type TableData = {
   year: number
   serviceType: string
   date: string | Date
+  appointment?: "sim" | "nao" | "pendente"
 }
 
 interface DynamicTableProps {
   data: TableData[]
   title?: string
+  onAppointmentChange?: (
+    itemId: string,
+    newValue: string,
+    itemData: TableData
+  ) => void
 }
 
-export function ListTable({ data, title }: DynamicTableProps) {
-  if (!data || data.length === 0) {
+export function ListTable({
+  data,
+  title,
+  onAppointmentChange,
+}: DynamicTableProps) {
+  const [tableData, setTableData] = React.useState(data)
+
+  React.useEffect(() => {
+    setTableData(data)
+  }, [data])
+
+  if (!tableData || tableData.length === 0) {
     return (
       <div className="p-6 text-center text-gray-500">
         Nenhum dado encontrado.
@@ -47,6 +70,28 @@ export function ListTable({ data, title }: DynamicTableProps) {
     const cleanNumber = formatPhoneNumber(phone)
     const url = `https://wa.me/55${cleanNumber}`
     window.open(url, "_blank")
+  }
+
+  const handleAppointmentChange = (itemId: string, newValue: string) => {
+    let updatedItem: TableData | undefined
+    setTableData((prevData) =>
+      prevData.map((item) => {
+        if (item.id === itemId) {
+          updatedItem = {
+            ...item,
+            appointment: newValue as "sim" | "nao" | "pendente",
+          }
+          return updatedItem
+        }
+        return item
+      })
+    )
+
+    if (updatedItem) {
+      if (onAppointmentChange) {
+        onAppointmentChange(itemId, newValue, updatedItem)
+      }
+    }
   }
 
   return (
@@ -72,30 +117,31 @@ export function ListTable({ data, title }: DynamicTableProps) {
             <TableHead>Ano</TableHead>
             <TableHead>Serviço</TableHead>
             <TableHead>Data</TableHead>
+            <TableHead>Agendamento</TableHead>
           </TableRow>
         </TableHeader>
 
         <TableBody>
-          {data.map((item, index) => (
+          {tableData.map((item, index) => (
             <TableRow
               key={item.id}
               className="flex flex-col sm:table-row mb-4 sm:mb-0 rounded-lg shadow-sm bg-white"
             >
               <TableCell className="p-3 sm:p-4">
                 <div className="flex flex-col gap-y-2 sm:hidden">
-                  <span className="font-semibold text-sm text-gray-700">Nome:</span>
-                  <span className="text-base text-gray-900">
-                    {item.name}
+                  <span className="font-semibold text-sm text-gray-700">
+                    Nome:
                   </span>
+                  <span className="text-base text-gray-900">{item.name}</span>
                 </div>
                 <span className="hidden sm:inline">{item.name}</span>
               </TableCell>
               <TableCell className="p-3 sm:p-4">
                 <div className="flex flex-col gap-y-2 sm:hidden">
-                  <span className="font-semibold text-sm text-gray-700">Telefone:</span>
-                  <span className="text-base text-gray-900">
-                    {item.phone}
+                  <span className="font-semibold text-sm text-gray-700">
+                    Telefone:
                   </span>
+                  <span className="text-base text-gray-900">{item.phone}</span>
                 </div>
                 <div className="flex items-center gap-2 sm:justify-start hidden sm:flex">
                   <span className="hidden sm:inline">{item.phone}</span>
@@ -111,43 +157,45 @@ export function ListTable({ data, title }: DynamicTableProps) {
               </TableCell>
               <TableCell className="p-3 sm:p-4">
                 <div className="flex flex-col gap-y-2 sm:hidden">
-                  <span className="font-semibold text-sm text-gray-700">Email:</span>
-                  <span className="text-base text-gray-900">
-                    {item.email}
+                  <span className="font-semibold text-sm text-gray-700">
+                    Email:
                   </span>
+                  <span className="text-base text-gray-900">{item.email}</span>
                 </div>
                 <span className="hidden sm:inline">{item.email}</span>
               </TableCell>
               <TableCell className="p-3 sm:p-4">
                 <div className="flex flex-col gap-y-2 sm:hidden">
-                  <span className="font-semibold text-sm text-gray-700">Modelo:</span>
-                  <span className="text-base text-gray-900">
-                    {item.model}
+                  <span className="font-semibold text-sm text-gray-700">
+                    Modelo:
                   </span>
+                  <span className="text-base text-gray-900">{item.model}</span>
                 </div>
                 <span className="hidden sm:inline">{item.model}</span>
               </TableCell>
               <TableCell className="p-3 sm:p-4">
                 <div className="flex flex-col gap-y-2 sm:hidden">
-                  <span className="font-semibold text-sm text-gray-700">Placa:</span>
-                  <span className="text-base text-gray-900">
-                    {item.plate}
+                  <span className="font-semibold text-sm text-gray-700">
+                    Placa:
                   </span>
+                  <span className="text-base text-gray-900">{item.plate}</span>
                 </div>
                 <span className="hidden sm:inline">{item.plate}</span>
               </TableCell>
               <TableCell className="p-3 sm:p-4">
                 <div className="flex flex-col gap-y-2 sm:hidden">
-                  <span className="font-semibold text-sm text-gray-700">Ano:</span>
-                  <span className="text-base text-gray-900">
-                    {item.year}
+                  <span className="font-semibold text-sm text-gray-700">
+                    Ano:
                   </span>
+                  <span className="text-base text-gray-900">{item.year}</span>
                 </div>
                 <span className="hidden sm:inline">{item.year}</span>
               </TableCell>
               <TableCell className="p-3 sm:p-4">
                 <div className="flex flex-col gap-y-2 sm:hidden">
-                  <span className="font-semibold text-sm text-gray-700">Serviço:</span>
+                  <span className="font-semibold text-sm text-gray-700">
+                    Serviço:
+                  </span>
                   <span className="text-base text-gray-900">
                     {item.serviceType}
                   </span>
@@ -156,7 +204,9 @@ export function ListTable({ data, title }: DynamicTableProps) {
               </TableCell>
               <TableCell className="p-3 sm:p-4">
                 <div className="flex flex-col gap-y-2 sm:hidden">
-                  <span className="font-semibold text-sm text-gray-700">Data:</span>
+                  <span className="font-semibold text-sm text-gray-700">
+                    Data:
+                  </span>
                   <span className="text-base text-gray-900">
                     {new Date(item.date).toLocaleDateString("pt-BR")}
                   </span>
@@ -164,6 +214,29 @@ export function ListTable({ data, title }: DynamicTableProps) {
                 <span className="hidden sm:inline">
                   {new Date(item.date).toLocaleDateString("pt-BR")}
                 </span>
+              </TableCell>
+
+              <TableCell className="p-3 sm:p-4">
+                <div className="flex flex-col gap-y-2 sm:hidden">
+                  <span className="font-semibold text-sm text-gray-700">
+                    Agendamento:
+                  </span>
+                </div>
+                <Select
+                  value={item.appointment || "pendente"}
+                  onValueChange={(newValue) =>
+                    handleAppointmentChange(item.id, newValue)
+                  }
+                >
+                  <SelectTrigger className="w-[100px]">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="sim">Sim</SelectItem>
+                    <SelectItem value="nao">Não</SelectItem>
+                    <SelectItem value="pendente">Pendente</SelectItem>
+                  </SelectContent>
+                </Select>
               </TableCell>
             </TableRow>
           ))}

@@ -21,6 +21,9 @@ model User {
   role         Role           @default(USER)
   appointments Appointments[]
 
+  // Relação inversa para Services que o usuário realizou
+  performedServices Services[] @relation(name: "PerformedServices")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -29,12 +32,6 @@ enum Role {
   USER
   ADMIN
 }
-
-//
-// ─────────────────────────────
-//   MODELO DE LEADS
-// ─────────────────────────────
-//
 
 model Leeads {
   id          String   @id @default(uuid())
@@ -46,6 +43,7 @@ model Leeads {
   year        Int
   serviceType String
   date        DateTime
+  role        Role     @default(ADMIN)
 
   // Se o lead foi convertido em agendamento
   converted Boolean @default(false)
@@ -56,12 +54,6 @@ model Leeads {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
-
-//
-// ─────────────────────────────
-//   MODELO DE AGENDAMENTOS
-// ─────────────────────────────
-//
 
 model Appointments {
   id          String   @id @default(uuid())
@@ -93,12 +85,6 @@ model Appointments {
   updatedAt DateTime @updatedAt
 }
 
-//
-// ─────────────────────────────
-//   MODELO DE CONFIRMAÇÃO DE AGENDAMENTO
-// ─────────────────────────────
-//
-
 model AppointmentConfirmation {
   id            String             @id @default(uuid())
   appointmentId String
@@ -112,4 +98,53 @@ enum ConfirmationStatus {
   PENDING
   CONFIRMED
   CANCELED
+}
+
+model Clients {
+  id    String @id @default(uuid())
+  name  String
+  phone String
+  email String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relação inversa para Services
+  services Services[]
+}
+
+model Vehicles {
+  id    String @id @default(uuid())
+  model String
+  year  Int
+  plate String
+  email String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relação inversa para Services
+  services Services[]
+}
+
+model Services {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  price       Float
+
+  // Relacionamento com Cliente
+  clientId String
+  client   Clients @relation(fields: [clientId], references: [id])
+
+  // Relacionamento com Veículo
+  vehicleId String
+  vehicle   Vehicles @relation(fields: [vehicleId], references: [id])
+
+  // Relacionamento com o Usuário que realizou o serviço
+  performedByUserId String
+  performedByUser   User   @relation(fields: [performedByUserId], references: [id], name: "PerformedServices")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -1,26 +1,28 @@
-"use client";
+"use client"
 
-import { useState, useEffect, useRef } from "react"; // Adicionado useRef
-import { ListTable } from "@/app/components/ListTable";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import { toast } from "sonner";
+import { useState, useEffect, useRef } from "react" // Adicionado useRef
+import { ListTable } from "@/app/components/ListTable"
+import { Button } from "@/components/ui/button"
+import { ArrowLeft, ArrowRight } from "lucide-react"
+import { toast } from "sonner"
+import { useAuth } from "@/app/context/AuthContext"
 
 export default function Feeds() {
-  const [data, setData] = useState([]);
-  const [empty, setEmpty] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
-  const [totalPages, setTotalPages] = useState(0);
-  const initialized = useRef(false); // Adicionado useRef para controlar a inicialização
+  const { user } = useAuth()
+  const [data, setData] = useState([])
+  const [empty, setEmpty] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage] = useState(10)
+  const [totalPages, setTotalPages] = useState(0)
+  const initialized = useRef(false)
 
   const getAllLeeds = async (page: number, limit: number) => {
-    console.log("getAllLeeds called"); // Debug log
+    console.log("getAllLeeds called") // Debug log
     try {
-      const res = await fetch(`/api/appointment?page=${page}&limit=${limit}`, {
+      const res = await fetch(`/api/leeds?page=${page}&limit=${limit}`, {
         cache: "no-store",
-      });
-      const result = await res.json();
+      })
+      const result = await res.json()
 
       if (!res.ok) {
         toast.error("Erro ao buscar leads.", {
@@ -35,19 +37,21 @@ export default function Feeds() {
             fontWeight: "500",
           },
           description: result.message || "Erro desconhecido",
-        });
+        })
         throw new Error(
           `Erro ao buscar dados: ${res.statusText} - ${
             result.message || "Erro desconhecido"
           }`
-        );
+        )
       }
 
-      setData(result.data);
-      setEmpty(result.data.length === 0);
-      setTotalPages(result.totalPages);
+      console.log(user?.id, user?.role)
 
-      console.log("Calling toast.success"); // Debug log
+      setData(result.data)
+      setEmpty(result.data.length === 0)
+      setTotalPages(result.totalPages)
+
+      console.log("Calling toast.success") // Debug log
       toast.success("✅ Leads carregados com sucesso!", {
         id: "leads-loaded-success", // Adicionado um ID único para evitar duplicação
         position: "top-right",
@@ -57,7 +61,7 @@ export default function Feeds() {
           background: "linear-gradient(90deg, #000 0%, #182848 100%)",
           color: "#fff",
         },
-      });
+      })
     } catch (error: any) {
       toast.error("Erro ao carregar leads.", {
         duration: 3000,
@@ -71,19 +75,107 @@ export default function Feeds() {
           fontWeight: "500",
         },
         description: error.message,
-      });
-      setEmpty(true);
+      })
+      setEmpty(true)
     }
-  };
+  }
 
   useEffect(() => {
-    console.log("useEffect called"); // Debug log
+    console.log(user?.id)
+    console.log(user?.id, user?.role)
+    console.log("useEffect called") // Debug log
     if (!initialized.current) {
-      initialized.current = true;
-      console.log("Initializing getAllLeeds"); // Debug log
-      getAllLeeds(currentPage, itemsPerPage);
+      initialized.current = true
+      console.log("Initializing getAllLeeds") // Debug log
+      getAllLeeds(currentPage, itemsPerPage)
     }
-  }, [currentPage, itemsPerPage]);
+  }, [currentPage, itemsPerPage])
+
+  const handleAppointmentChangeInDashboard = async (
+    itemId: string,
+    newValue: string,
+    itemData: any
+  ) => {
+    if (newValue === "nao") {
+      try {
+        const response = await fetch("/api/send-to-n8n", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(itemData),
+        })
+
+        if (response.ok) {
+          toast.success("✅ dados enviado com sucesso para o n8n", {
+            id: "appointment-nao-success",
+            position: "top-right",
+            richColors: true,
+            duration: 4000,
+            style: {
+              background: "linear-gradient(90deg, #000 0%, #182848 100%)",
+              color: "#fff",
+            },
+          })
+        } else {
+          toast.error(
+            "Erro ao atualizar agendamento para 'Não' no banco de dados.",
+            {
+              id: "appointment-nao-error",
+              position: "top-right",
+              richColors: true,
+              duration: 4000,
+              style: {
+                background: "linear-gradient(90deg, #b71c1c 0%, #4a0000 100%)",
+                color: "#fff",
+              },
+            }
+          )
+        }
+      } catch (error) {
+        console.error("Erro ao fazer requisição para o backend:", error)
+      }
+    }
+
+    if (newValue === "sim") {
+      const payload = {
+        ...itemData,
+        leadId: itemData.id,
+        userId: user?.id,
+      }
+      const response = await fetch("/api/appointment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      })
+      if (response.ok) {
+        toast.success("✅ Agendamento confirmado com sucesso!", {
+          id: "appointment-success",
+          position: "top-right",
+          richColors: true,
+          duration: 4000,
+          style: {
+            background: "linear-gradient(90deg, #000 0%, #182848 100%)",
+            color: "#fff",
+          },
+        })
+        console.log("Agendamento confirmado com sucesso!", payload)
+      } else {
+        toast.error("Agendamento ja foi confirmado.", {
+          id: "appointment-error",
+          position: "top-right",
+          richColors: true,
+          duration: 4000,
+          style: {
+            background: "linear-gradient(90deg, #b71c1c 0%, #4a0000 100%)",
+            color: "#fff",
+          },
+        })
+      }
+    }
+  }
 
   return (
     <div className="w-full h-full px-4 py-4">
@@ -92,19 +184,20 @@ export default function Feeds() {
         <p className="mt-2 text-lg text-gray-600">
           Listando todos os feeds que vieram do site
         </p>
-
-        {/* Área da listagem dos feeds */}
         <div className="mt-4 overflow-x-auto">
           {empty ? (
             <div className="p-6 text-center text-gray-500">
               Nenhum dado encontrado.
             </div>
           ) : (
-            <ListTable data={data} title="Lista de Leads" />
+            <ListTable
+              data={data}
+              title="Lista de Leads"
+              onAppointmentChange={handleAppointmentChangeInDashboard}
+            />
           )}
         </div>
 
-        {/* Controles de Paginação */}
         <div className="flex justify-between items-center mt-4">
           <Button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
@@ -130,5 +223,5 @@ export default function Feeds() {
         </div>
       </div>
     </div>
-  );
+  )
 }

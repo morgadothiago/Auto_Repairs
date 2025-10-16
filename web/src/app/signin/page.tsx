@@ -13,7 +13,9 @@ import {
 import { Label } from "@/components/ui/label"
 import { Controller, useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
-import * as yup from "yup" // <- componente com ícone
+import * as yup from "yup"
+import { signInSchema } from "@/app/schemas/signInSchema"
+
 import { Mail, Lock } from "lucide-react" // <- ícones
 import TextInput from "../components/Input"
 import { useAuth } from "../context/AuthContext"
@@ -23,24 +25,14 @@ import { toast } from "sonner"
 import { useState } from "react";
 import LoadingScreen from "../components/LoadingScreen";
 
-// 1. Schema de validação
-const signInSchema = yup.object().shape({
-  email: yup.string().email("Email inválido").required("Email é obrigatório"),
-  password: yup.string().required("Senha é obrigatória"),
-})
-
-type SignInFormData = yup.InferType<typeof signInSchema>
-
-export default function LoginPage() {
+export default function SignInPage() {
   const router = useRouter()
-  const { isAuthenticated, isLoading: authLoading } = useAuth()
+  const { signIn: authSignIn } = useAuth()
   const [isLoading, setIsLoading] = useState(false);
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<SignInFormData>({
+  type SignInFormData = yup.InferType<typeof signInSchema>
+
+  const { handleSubmit, control, formState: { errors } } = useForm<SignInFormData>({
     resolver: yupResolver(signInSchema),
     defaultValues: {
       email: "",

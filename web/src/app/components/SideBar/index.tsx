@@ -35,7 +35,7 @@ export const menuItems = [
   },
   {
     title: "Agendamentos",
-    url: "/appointments",
+    url: "/dashboard/admin/appoiment",
     icon: Calendar,
     roles: ["admin", "user"],
   },
