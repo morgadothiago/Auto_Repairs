@@ -28,6 +28,7 @@ CREATE TABLE "Leeads" (
     "year" INTEGER NOT NULL,
     "serviceType" TEXT NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
+    "role" "Role" NOT NULL DEFAULT 'ADMIN',
     "converted" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,

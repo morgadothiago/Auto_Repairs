@@ -45,6 +45,8 @@ export default function Feeds() {
         )
       }
 
+      console.log(user?.id, user?.role)
+
       setData(result.data)
       setEmpty(result.data.length === 0)
       setTotalPages(result.totalPages)
@@ -80,6 +82,7 @@ export default function Feeds() {
 
   useEffect(() => {
     console.log(user?.id)
+    console.log(user?.id, user?.role)
     console.log("useEffect called") // Debug log
     if (!initialized.current) {
       initialized.current = true

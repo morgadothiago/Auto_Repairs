@@ -43,6 +43,7 @@ model Leeads {
   year        Int
   serviceType String
   date        DateTime
+  role        Role     @default(ADMIN)
 
   // Se o lead foi convertido em agendamento
   converted Boolean @default(false)
