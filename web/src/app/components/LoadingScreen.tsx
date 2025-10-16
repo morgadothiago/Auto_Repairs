@@ -1,6 +1,9 @@
 "use client"
 
+import Lottie from "lottie-react"
 import React from "react"
+
+import Loading from "../../../public/Speedometer.json"
 
 interface LoadingScreenProps {
   isLoading: boolean
@@ -11,7 +14,12 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ isLoading }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
-      <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-black"></div>
+      <Lottie
+        animationData={require("../../../public/Speedometer.json")}
+        loop={true}
+        autoPlay={true}
+        style={{ width: 300, height: 300 }}
+      />
     </div>
   )
 }
