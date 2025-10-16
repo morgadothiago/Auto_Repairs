@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react"
 import { useRouter, usePathname } from "next/navigation"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import LoadingScreen from "./LoadingScreen"
 
 export default function AuthRedirector({
@@ -13,6 +13,7 @@ export default function AuthRedirector({
   const { data: session, status } = useSession()
   const router = useRouter()
   const pathname = usePathname()
+  const [showLoading, setShowLoading] = useState(true)
 
   useEffect(() => {
     if (status === "unauthenticated" && pathname !== "/") {
@@ -20,8 +21,19 @@ export default function AuthRedirector({
     }
   }, [status, router, pathname])
 
-  if (status === "loading") {
-    return <LoadingScreen isLoading={status === "loading"} />
+  useEffect(() => {
+    if (status === "loading") {
+      setShowLoading(true)
+    } else {
+      const timer = setTimeout(() => {
+        setShowLoading(false)
+      }, 1000) // Atraso de 1 segundo (1000 ms)
+      return () => clearTimeout(timer)
+    }
+  }, [status])
+
+  if (status === "loading" || showLoading) {
+    return <LoadingScreen isLoading={true} />
   }
 
   return <>{children}</>

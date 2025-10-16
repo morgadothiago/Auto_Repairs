@@ -45,7 +45,8 @@ export default function SignInPage() {
     const res = await signIn("credentials", {
       email: data.email,
       password: data.password,
-      redirect: false,
+      redirect: true, // Deixa o next-auth lidar com o redirecionamento
+      callbackUrl: "/dashboard", // Redireciona para o dashboard após o sucesso
     })
 
     if (res?.error) {
@@ -66,6 +67,8 @@ export default function SignInPage() {
       return
     }
 
+    // Se o redirecionamento for bem-sucedido, o código abaixo não será alcançado
+    // A tela de carregamento será automaticamente removida na nova página
     toast.success("✅ Login efetuado com sucesso!", {
       position: "top-right",
       richColors: true,
@@ -75,9 +78,6 @@ export default function SignInPage() {
         color: "#fff",
       },
     })
-
-    router.push("/dashboard")
-    setIsLoading(false); // Hide loading screen after navigation
   }
 
 
